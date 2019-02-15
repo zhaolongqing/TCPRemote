@@ -90,7 +90,11 @@ public class ClientService extends Service implements TcpClient.NioResponse {
 
         private ClientServiceListener listener;
 
-        public ClientService getService(String ip, int port, String deviceId,ClientServiceListener listener) {
+        public ClientService getService() {
+            return ClientService.this;
+        }
+
+        public ClientService getService(String ip, int port, String deviceId, ClientServiceListener listener) {
             this.listener = listener;
             startClient(ip, port, deviceId);
             return ClientService.this;
