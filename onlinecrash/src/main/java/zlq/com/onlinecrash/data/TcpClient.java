@@ -69,6 +69,7 @@ public class TcpClient {
                 Log.e(TAG, "startClient", e);
             }
         });
+        nioResponse.connectOk();
     }
 
     /**
@@ -118,6 +119,8 @@ public class TcpClient {
         void clientError();
 
         void receive(String res);//接收消息
+
+        void connectOk();
     }
 
     /**

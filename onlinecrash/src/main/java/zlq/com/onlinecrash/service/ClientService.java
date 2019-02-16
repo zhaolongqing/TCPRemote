@@ -11,11 +11,10 @@ import zlq.com.onlinecrash.data.TcpClient;
 /**
  * author: ZlqPC
  * created on: 2019/2/15 13:06
- * description:发送startLog标识，接收true
+ * description:
  */
 public class ClientService extends Service {
 
-    private boolean beConnect;
     private ClientBinder binder;
 
     public Intent startService(Context context, String ip, int port) {
@@ -30,11 +29,10 @@ public class ClientService extends Service {
         context.stopService(intent);
     }
 
-    public void startClient(String ip, int port, String deviceId) {
+    public void startClient(String ip, int port) {
         if (ip != null && port != 0) {
             TcpClient.getInstance().startResponse(binder.listener);
             TcpClient.getInstance().startClient(ip, port);
-            TcpClient.getInstance().sendMessage("startLog:" + deviceId);
         }
     }
 
@@ -48,8 +46,7 @@ public class ClientService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String ip = intent.getStringExtra("ip");
         int port = intent.getIntExtra("port", 0);
-        String deviceId = intent.getStringExtra("deviceId");
-        startClient(ip, port, deviceId);
+        startClient(ip, port);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -78,7 +75,7 @@ public class ClientService extends Service {
 
         public ClientService getService(String ip, int port, String deviceId, TcpClient.NioResponse listener) {
             this.listener = listener;
-            startClient(ip, port, deviceId);
+            startClient(ip, port);
             return ClientService.this;
         }
 
