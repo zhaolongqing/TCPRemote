@@ -134,6 +134,9 @@ public class TcpClient {
                 while (selector.select() > 0) {
                     //返回的是select的key集合并遍历（如果一个key所指的对象为空会报异常）
                     for (SelectionKey key : selector.selectedKeys()) {
+                        if (sc == null || !sc.isConnected()) {
+                            return;
+                        }
                         //如果该SelectionKey对应的Channel中有可读的数据
                         if (key.isReadable()) {
                             ByteBuffer buff = ByteBuffer.allocate(1024);
@@ -147,9 +150,6 @@ public class TcpClient {
                             //输出数据
                             if (nioResponse != null) {
                                 nioResponse.receive(content.toString());
-                            }
-                            if (sc == null || !sc.isConnected()) {
-                                return;
                             }
                             //为下一次读取作准备
                             key.interestOps(SelectionKey.OP_READ);
