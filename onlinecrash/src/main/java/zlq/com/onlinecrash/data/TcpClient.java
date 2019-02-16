@@ -64,6 +64,7 @@ public class TcpClient {
                 while (!sc.finishConnect()) {
                     Thread.sleep(100);
                 }
+                Thread.sleep(100);
                 nioResponse.connectOk();
             } catch (Exception e) {
                 if (nioResponse != null) {
