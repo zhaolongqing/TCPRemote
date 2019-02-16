@@ -94,6 +94,9 @@ public class TcpClient {
                 try {
                     sc.write(charset.encode(res));
                 } catch (IOException e) {
+                    if (nioResponse != null) {
+                        nioResponse.clientError();
+                    }
                     Log.e(TAG, "sendMessage", e);
                 }
             } else {
@@ -129,6 +132,7 @@ public class TcpClient {
             super("ResponseThread");
             this.nioResponse = nioResponse;
         }
+
         @Override
         public void run() {
             try {
@@ -166,11 +170,13 @@ public class TcpClient {
                     }
                 }
             } catch (Exception e) {
+                if (nioResponse != null) {
+                    nioResponse.clientError();
+                }
                 Log.e(TAG, "startClient", e);
             }
 
         }
-
 
 
     }
