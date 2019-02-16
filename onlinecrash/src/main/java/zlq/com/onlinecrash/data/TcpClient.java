@@ -64,6 +64,7 @@ public class TcpClient {
                 while (!sc.finishConnect()) {
                     Thread.sleep(100);
                 }
+                nioResponse.connectOk();
             } catch (Exception e) {
                 if (nioResponse != null) {
                     nioResponse.clientError();
@@ -72,7 +73,6 @@ public class TcpClient {
                 Log.e(TAG, "startClient", e);
             }
         });
-        nioResponse.connectOk();
     }
 
     /**
