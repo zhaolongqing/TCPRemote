@@ -69,14 +69,14 @@ public class ClientService extends Service {
     public class ClientBinder extends Binder {
 
 
-        private ClientServiceListener listener;
+        private TcpClient.NioResponse listener;
 
-        public ClientService getService(ClientServiceListener listener) {
+        public ClientService getService(TcpClient.NioResponse listener) {
             this.listener = listener;
             return ClientService.this;
         }
 
-        public ClientService getService(String ip, int port, String deviceId, ClientServiceListener listener) {
+        public ClientService getService(String ip, int port, String deviceId, TcpClient.NioResponse listener) {
             this.listener = listener;
             startClient(ip, port, deviceId);
             return ClientService.this;
