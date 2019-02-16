@@ -63,19 +63,19 @@ public class ClientService extends Service implements TcpClient.NioResponse {
     @Override
     public void sendNoConnect() {
         Toast.makeText(this, "device not connected", Toast.LENGTH_SHORT).show();
-        binder.listener.unbind();
+        binder.listener.unbind(this);
     }
 
     @Override
     public void clientError() {
         Toast.makeText(this, "please check you address", Toast.LENGTH_SHORT).show();
-        binder.listener.unbind();
+        binder.listener.unbind(this);
     }
 
     @Override
     public void receive(String res) {
         if (!res.equals("true")) {
-            binder.listener.unbind();
+            binder.listener.unbind(this);
         }
     }
 

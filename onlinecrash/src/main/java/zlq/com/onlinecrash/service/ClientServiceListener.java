@@ -1,5 +1,7 @@
 package zlq.com.onlinecrash.service;
 
+import android.content.Context;
+
 /**
  * author: ZlqPC
  * created on: 2019/2/15 16:24
@@ -7,6 +9,6 @@ package zlq.com.onlinecrash.service;
  */
 public interface ClientServiceListener {
 
-    void unbind();
+    void unbind(Context context);
 
 }
