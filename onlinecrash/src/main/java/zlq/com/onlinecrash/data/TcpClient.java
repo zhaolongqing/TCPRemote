@@ -30,6 +30,7 @@ public class TcpClient {
     private NioResponse nioResponse;
     private Charset charset = Charset.forName("UTF-8");
     private Handler clientHandler;
+    private ResponseThread responseThread;
 
     //私有化构造方法（单例模式）
     private TcpClient() {
@@ -58,11 +59,13 @@ public class TcpClient {
                 sc.configureBlocking(false);
                 //将SocketChannel对象注册到指定Selector
                 sc.register(selector, SelectionKey.OP_READ);
-                new ResponseThread(nioResponse).start();
+                responseThread = new ResponseThread(nioResponse);
+                responseThread.start();
             } catch (IOException e) {
                 if (nioResponse != null) {
                     nioResponse.clientError();
                 }
+                release();
                 Log.e(TAG, "startClient", e);
             }
         });
@@ -134,9 +137,6 @@ public class TcpClient {
                 while (selector.select() > 0) {
                     //返回的是select的key集合并遍历（如果一个key所指的对象为空会报异常）
                     for (SelectionKey key : selector.selectedKeys()) {
-                        if (sc == null || !sc.isConnected()) {
-                            return;
-                        }
                         //如果该SelectionKey对应的Channel中有可读的数据
                         if (key.isReadable()) {
                             ByteBuffer buff = ByteBuffer.allocate(1024);
@@ -151,8 +151,16 @@ public class TcpClient {
                             if (nioResponse != null) {
                                 nioResponse.receive(content.toString());
                             }
-                            //为下一次读取作准备
-                            key.interestOps(SelectionKey.OP_READ);
+                            if (sc == null || !sc.isConnected()) {
+                                return;
+                            }
+                            if (key.isValid()) {
+                                //为下一次读取作准备
+                                key.interestOps(SelectionKey.OP_READ);
+                            } else {
+                                key.cancel();
+                                return;
+                            }
                         }
                         //删除正在处理的SelectionKey
                         selector.selectedKeys().remove(key);
@@ -163,15 +171,25 @@ public class TcpClient {
             }
 
         }
+
+
     }
 
     public void release() {
         try {
+            if (responseThread != null && responseThread.isAlive()) {
+                responseThread.interrupt();
+                responseThread = null;
+            }
+            if (sc != null) {
+                sc.close();
+                sc = null;
+            }
+            if (selector != null) {
+                selector.close();
+                selector = null;
+            }
             nioResponse = null;
-            selector.close();
-            sc.close();
-            selector = null;
-            sc = null;
         } catch (IOException e) {
             Log.e(TAG, "release", e);
         }
