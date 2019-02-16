@@ -73,7 +73,7 @@ public class ClientService extends Service {
             return ClientService.this;
         }
 
-        public ClientService getService(String ip, int port, String deviceId, TcpClient.NioResponse listener) {
+        public ClientService getService(String ip, int port, TcpClient.NioResponse listener) {
             this.listener = listener;
             startClient(ip, port);
             return ClientService.this;
