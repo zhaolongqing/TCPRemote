@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.widget.Toast;
 
 import zlq.com.onlinecrash.data.TcpClient;
 
@@ -14,7 +13,7 @@ import zlq.com.onlinecrash.data.TcpClient;
  * created on: 2019/2/15 13:06
  * description:发送startLog标识，接收true
  */
-public class ClientService extends Service implements TcpClient.NioResponse {
+public class ClientService extends Service {
 
     private boolean beConnect;
     private ClientBinder binder;
@@ -33,7 +32,7 @@ public class ClientService extends Service implements TcpClient.NioResponse {
 
     public void startClient(String ip, int port, String deviceId) {
         if (ip != null && port != 0) {
-            TcpClient.getInstance().startResponse(this);
+            TcpClient.getInstance().startResponse(binder.listener);
             TcpClient.getInstance().startClient(ip, port);
             TcpClient.getInstance().sendMessage("startLog:" + deviceId);
         }
@@ -60,24 +59,6 @@ public class ClientService extends Service implements TcpClient.NioResponse {
         return binder;
     }
 
-    @Override
-    public void sendNoConnect() {
-        Toast.makeText(this, "device not connected", Toast.LENGTH_SHORT).show();
-        binder.listener.unbind(this);
-    }
-
-    @Override
-    public void clientError() {
-        Toast.makeText(this, "please check you address", Toast.LENGTH_SHORT).show();
-        binder.listener.unbind(this);
-    }
-
-    @Override
-    public void receive(String res) {
-        if (!res.equals("true")) {
-            binder.listener.unbind(this);
-        }
-    }
 
     @Override
     public void onDestroy() {
