@@ -129,12 +129,11 @@ public class TcpClient {
             super("ResponseThread");
             this.nioResponse = nioResponse;
         }
-
         @Override
         public void run() {
             try {
                 //io操作的读，管道（Channel）至少有1个
-                while (selector.select() > 0) {
+                while (selector.isOpen() && selector.select() > 0) {
                     //返回的是select的key集合并遍历（如果一个key所指的对象为空会报异常）
                     for (SelectionKey key : selector.selectedKeys()) {
                         //如果该SelectionKey对应的Channel中有可读的数据
@@ -154,7 +153,7 @@ public class TcpClient {
                             if (sc == null || !sc.isConnected()) {
                                 return;
                             }
-                            if (key.isValid()) {
+                            if (key.isConnectable() && key.isValid()) {
                                 //为下一次读取作准备
                                 key.interestOps(SelectionKey.OP_READ);
                             } else {
@@ -166,11 +165,12 @@ public class TcpClient {
                         selector.selectedKeys().remove(key);
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "startClient", e);
             }
 
         }
+
 
 
     }
