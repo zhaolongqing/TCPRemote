@@ -61,7 +61,10 @@ public class TcpClient {
                 sc.register(selector, SelectionKey.OP_READ);
                 responseThread = new ResponseThread(nioResponse);
                 responseThread.start();
-            } catch (IOException e) {
+                while (!sc.finishConnect()) {
+                    Thread.sleep(100);
+                }
+            } catch (Exception e) {
                 if (nioResponse != null) {
                     nioResponse.clientError();
                 }
