@@ -170,6 +170,8 @@ public class TcpClient {
             nioResponse = null;
             selector.close();
             sc.close();
+            selector = null;
+            sc = null;
         } catch (IOException e) {
             Log.e(TAG, "release", e);
         }
